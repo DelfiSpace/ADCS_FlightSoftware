@@ -1,5 +1,5 @@
 /*
- * EPS.h
+ * ADCS.h
  *
  *  Created on: 23 Jul 2019
  *      Author: stefanosperett
@@ -18,6 +18,10 @@
 #include "PQ9CommandHandler.h"
 #include "Service.h"
 #include "PingService.h"
+#include "HousekeepingService.h"
+#include "ADCSHousekeepingService.h"
+#include "ADCSTelemetryContainer.h"
+#include "TMP100.h"
 
 #define FCLOCK 48000000
 
