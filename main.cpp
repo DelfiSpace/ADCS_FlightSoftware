@@ -21,11 +21,22 @@ DSerial serial;
 
 // services running in the system
 PingService ping;
+ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
 ADCSHousekeepingService hk;
-Service* services[] = { &ping, &hk };
+Service* services[] = { &ping, &reset, &hk };
 
 // command handler, dealing with all CDHS requests and responses
-PQ9CommandHandler cmdHandler(pq9bus, services, 2);
+PQ9CommandHandler cmdHandler(pq9bus, services, 3);
+
+// system uptime
+unsigned long uptime = 0;
+volatile int counter = 0;
+
+void timerHandler(void)
+{
+    MAP_Timer32_clearInterruptFlag(TIMER32_0_BASE);
+    counter++;
+}
 
 /**
  * main.c
@@ -71,23 +82,42 @@ void main(void)
     // initialize the command handler: from now on, commands can be processed
     cmdHandler.init();
 
+    // initialize the reset handler
+    reset.init();
+
+    // Configuring Timer32 to FCLOCK (1s) of MCLK in periodic mode
+    MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
+            TIMER32_PERIODIC_MODE);
+    MAP_Timer32_registerInterrupt(TIMER32_0_INTERRUPT, &timerHandler);
+    MAP_Timer32_setCount(TIMER32_0_BASE, FCLOCK);
+    MAP_Timer32_startTimer(TIMER32_0_BASE, false);
+
+
     serial.println("Hello World");
 
-    int counter = 0;
     while(true)
     {
         cmdHandler.commandLoop();
 
         // hack to simulate timer to acquire telemetry approximately once per second
-        if (counter >= 1400000)
+        if (counter != 0)
         {
+            uptime ++;
+
+            // toggle WDI every 2 seconds
+            if (uptime %2 )
+            {
+                reset.kickHardwareWatchDog();
+            }
             counter = 0;
-            serial.println("Acquiring telemetry....");
 
             ADCSTelemetryContainer *tc = static_cast<ADCSTelemetryContainer*>(hk.getContainerToWrite());
 
             unsigned short v;
             signed short i, t;
+
+            // set uptime in telemetry
+            tc->setUpTime(uptime);
 
             // measure the power bus
             tc->setBusStatus(!powerBus.getVoltage(v));
@@ -121,6 +151,7 @@ void main(void)
             hk.stageTelemetry();
         }
 
-        counter++;
+        //counter++;
+        //MAP_PCM_gotoLPM0();
     }
 }

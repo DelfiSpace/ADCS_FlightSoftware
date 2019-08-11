@@ -21,6 +21,9 @@ public:
     virtual int size();
     virtual unsigned char * getArray();
 
+    unsigned long getUpTime();
+    void setUpTime(unsigned long ulong);
+
     signed short getTemperature();
     void setTemperature(signed short ushort);
     bool getTmpStatus();

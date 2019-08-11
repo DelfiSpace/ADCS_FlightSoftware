@@ -17,6 +17,25 @@ unsigned char* ADCSTelemetryContainer::getArray()
     return &telemetry[0];
 }
 
+unsigned long ADCSTelemetryContainer::getUpTime()
+{
+    unsigned long ulong;
+    ((unsigned char *)&ulong)[3] = telemetry[0];
+    ((unsigned char *)&ulong)[2] = telemetry[1];
+    ((unsigned char *)&ulong)[1] = telemetry[2];
+    ((unsigned char *)&ulong)[0] = telemetry[3];
+    return ulong;
+}
+
+void ADCSTelemetryContainer::setUpTime(unsigned long ulong)
+{
+    *((unsigned long *)&(telemetry[0])) = ulong;
+    telemetry[0] = ((unsigned char *)&ulong)[3];
+    telemetry[1] = ((unsigned char *)&ulong)[2];
+    telemetry[2] = ((unsigned char *)&ulong)[1];
+    telemetry[3] = ((unsigned char *)&ulong)[0];
+}
+
 bool ADCSTelemetryContainer::getBusStatus()
 {
     return ((telemetry[7] & 0x02) != 0);
