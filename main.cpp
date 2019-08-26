@@ -43,25 +43,16 @@ void timerHandler(void)
  */
 void main(void)
 {
-    // Disabling the Watchdog timer
-    MAP_WDT_A_holdTimer( );
+    // initialize the MCU:
+    // - clock source
+    // - clock tree
+    DelfiPQcore::initMCU();
 
-    // Configuring pins for HF XTAL
-    MAP_GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_PJ,
-            GPIO_PIN3 | GPIO_PIN2, GPIO_PRIMARY_MODULE_FUNCTION);
-
-    // Starting HFXT in non-bypass mode without a timeout. Before we start
-    // we have to change VCORE to 1 to support the 48MHz frequency
-    MAP_CS_setExternalClockSourceFrequency(0, FCLOCK);
-    MAP_PCM_setCoreVoltageLevel(PCM_VCORE1);
-    MAP_FlashCtl_setWaitState(FLASH_BANK0, 2);
-    MAP_FlashCtl_setWaitState(FLASH_BANK1, 2);
-    MAP_CS_startHFXT(false);
-
-    // Configure clocks that we need
-    MAP_CS_initClockSignal(CS_MCLK, CS_HFXTCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    MAP_CS_initClockSignal(CS_SMCLK, CS_HFXTCLK_SELECT, CS_CLOCK_DIVIDER_4);
-    MAP_CS_initClockSignal(CS_HSMCLK, CS_HFXTCLK_SELECT, CS_CLOCK_DIVIDER_2);
+    // init the reset handler:
+    // - prepare the watchdog
+    // - initialize the pins for the hardware watchdog
+    // prepare the pin for power cycling the system
+    reset.init();
 
     // Initialize I2C master
     I2Cinternal.setFastMode();
@@ -82,9 +73,6 @@ void main(void)
     // initialize the command handler: from now on, commands can be processed
     cmdHandler.init();
 
-    // initialize the reset handler
-    reset.init();
-
     // Configuring Timer32 to FCLOCK (1s) of MCLK in periodic mode
     MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
             TIMER32_PERIODIC_MODE);
@@ -97,18 +85,16 @@ void main(void)
 
     while(true)
     {
-        cmdHandler.commandLoop();
+        if (cmdHandler.commandLoop())
+        {
+            // if a correct command has been received, clear the watchdog
+            reset.kickInternalWatchDog();
+        }
 
         // hack to simulate timer to acquire telemetry approximately once per second
         if (counter != 0)
         {
             uptime ++;
-
-            // toggle WDI every 2 seconds
-            if (uptime %2 )
-            {
-                reset.kickHardwareWatchDog();
-            }
             counter = 0;
 
             ADCSTelemetryContainer *tc = static_cast<ADCSTelemetryContainer*>(hk.getContainerToWrite());
@@ -149,6 +135,8 @@ void main(void)
 
             // telemetry collected, store the values and prepare for next collection
             hk.stageTelemetry();
+
+            reset.kickExternalWatchDog();
         }
 
         //counter++;

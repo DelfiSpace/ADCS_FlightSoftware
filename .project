@@ -3,6 +3,7 @@
 	<name>ADCS_FlightSoftware</name>
 	<comment></comment>
 	<projects>
+		<project>DelfiPQcore</project>
 		<project>DWire</project>
 		<project>INA226</project>
 		<project>PQ9Bus</project>

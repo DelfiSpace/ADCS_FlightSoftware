@@ -46,6 +46,7 @@
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/LTC2942"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/INA226"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DWire"/>
+									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DelfiPQcore"/>
 									<listOptionValue builtIn="false" value="${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/ti/devices/msp432p4xx/driverlib"/>
 									<listOptionValue builtIn="false" value="${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source"/>
 									<listOptionValue builtIn="false" value="${CCS_BASE_ROOT}/arm/include"/>
@@ -84,6 +85,7 @@
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/TMP100/${ConfigName}/TMP100.lib"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/INA226/${ConfigName}/INA226.lib"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DWire/${ConfigName}/DWire.lib"/>
+									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DelfiPQcore/${ConfigName}/DelfiPQcore.lib"/>
 									<listOptionValue builtIn="false" value="${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/ti/devices/msp432p4xx/driverlib/ccs/msp432p4xx_driverlib.lib"/>
 									<listOptionValue builtIn="false" value="libc.a"/>
 								</option>
@@ -104,6 +106,7 @@
 				<externalSettings containerId="PQ9Bus;com.ti.ccstudio.buildDefinitions.MSP432.Debug.1621818276" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
 				<externalSettings containerId="INA226;com.ti.ccstudio.buildDefinitions.MSP432.Debug.2134378591" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
 				<externalSettings containerId="TMP100;com.ti.ccstudio.buildDefinitions.MSP432.Debug.1175418372" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+				<externalSettings containerId="DelfiPQcore;com.ti.ccstudio.buildDefinitions.MSP432.Debug.1175418372" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
 			</storageModule>
 		</cconfiguration>
 		<cconfiguration id="com.ti.ccstudio.buildDefinitions.MSP432.Release.2110840172">
@@ -138,6 +141,7 @@
 									<listOptionValue builtIn="false" value="${CCS_BASE_ROOT}/arm/include"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/PQ9Bus"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DWire"/>
+									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DelfiPQcore"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/LTC2942"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/INA226"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/TMP100"/>
@@ -183,6 +187,7 @@
 									<listOptionValue builtIn="false" value="${COM_TI_SIMPLELINK_MSP432_SDK_INSTALL_DIR}/source/ti/devices/msp432p4xx/driverlib/ccs/msp432p4xx_driverlib.lib"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/PQ9Bus/${ConfigName}/PQ9Bus.lib"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DWire/${ConfigName}/DWire.lib"/>
+									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/DelfiPQcore/${ConfigName}/DelfiPQcore.lib"/>
 									<listOptionValue builtIn="false" value="${WORKSPACE_LOC}/INA226/${ConfigName}/INA226.lib"/>
 									<listOptionValue builtIn="false" value="${INHERITED_LIBRARIES}"/>
 								</option>
@@ -210,6 +215,7 @@
 				<externalSettings containerId="PQ9Bus;com.ti.ccstudio.buildDefinitions.MSP432.Release.670474376" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
 				<externalSettings containerId="INA226;com.ti.ccstudio.buildDefinitions.MSP432.Release.845204607" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
 				<externalSettings containerId="TMP100;com.ti.ccstudio.buildDefinitions.MSP432.Release.657703763" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
+				<externalSettings containerId="DelfiPQcore;com.ti.ccstudio.buildDefinitions.MSP432.Release.657703763" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier"/>
 			</storageModule>
 		</cconfiguration>
 	</storageModule>
