@@ -28,14 +28,89 @@ Service* services[] = { &ping, &reset, &hk };
 // command handler, dealing with all CDHS requests and responses
 PQ9CommandHandler cmdHandler(pq9bus, services, 3);
 
+// ADCS board tasks
+Task cmdTask(commandTask);
+PeriodicTask timerTask(FCLOCK, periodicTask);
+Task* tasks[] = { &cmdTask, &timerTask };
+
 // system uptime
 unsigned long uptime = 0;
-volatile int counter = 0;
 
-void timerHandler(void)
+void onReceive( PQ9Frame &newFrame )
 {
-    MAP_Timer32_clearInterruptFlag(TIMER32_0_BASE);
-    counter++;
+    cmdHandler.received(newFrame);
+    cmdTask.notify();
+}
+
+// handler used for the execution of received commands
+void commandTask()
+{
+    if (cmdHandler.handleCommands())
+    {
+        // if a correct command has been received, clear the watch-dog
+        // if no command is received before the watch-dog triggers,
+        // the board is power-cycled
+        reset.kickInternalWatchDog();
+    }
+}
+
+void periodicTask()
+{
+    // increase the timer, this happens every second
+    uptime++;
+
+    // collect telemetry
+    ADCSTelemetryContainer *tc = static_cast<ADCSTelemetryContainer*>(hk.getContainerToWrite());
+
+    // acquire telemetry
+    acquireTelemetry(tc);
+
+    // telemetry collected, store the values and prepare for next collection
+    hk.stageTelemetry();
+
+    // refresh the watch-dog configuration to make sure that, even in case of internal
+    // registers corruption, the watch-dog is capable of recovering from an error
+    reset.refreshConfiguration();
+
+    // kick hardware watch-dog after every telemetry collection happens
+    reset.kickExternalWatchDog();
+}
+
+void acquireTelemetry(ADCSTelemetryContainer *tc)
+{
+    unsigned short v;
+    signed short i, t;
+
+    // set uptime in telemetry
+    tc->setUpTime(uptime);
+
+    // measure the power bus
+    tc->setBusStatus(!powerBus.getVoltage(v));
+    tc->setBusVoltage(v);
+    tc->setBusStatus(!powerBus.getCurrent(i));
+    tc->setBusCurrent(i);
+
+    // measure the torquer X
+    tc->setTorquerXStatus(!torquerX.getVoltage(v));
+    tc->setTorquerXVoltage(v);
+    tc->setTorquerXStatus(!torquerX.getCurrent(i));
+    tc->setTorquerXCurrent(i);
+
+    // measure the torquer Y
+    tc->setTorquerYStatus(!torquerY.getVoltage(v));
+    tc->setTorquerYVoltage(v);
+    tc->setTorquerYStatus(!torquerY.getCurrent(i));
+    tc->setTorquerYCurrent(i);
+
+    // measure the torquer Z
+    tc->setTorquerZStatus(!torquerZ.getVoltage(v));
+    tc->setTorquerZVoltage(v);
+    tc->setTorquerZStatus(!torquerZ.getCurrent(i));
+    tc->setTorquerZCurrent(i);
+
+    // acquire board temperature
+    tc->setTmpStatus(!temp.getTemperature(t));
+    tc->setTemperature(t);
 }
 
 /**
@@ -48,9 +123,9 @@ void main(void)
     // - clock tree
     DelfiPQcore::initMCU();
 
-    // init the reset handler:
-    // - prepare the watchdog
-    // - initialize the pins for the hardware watchdog
+    // initialize the reset handler:
+    // - prepare the watch-dog
+    // - initialize the pins for the hardware watch-dog
     // prepare the pin for power cycling the system
     reset.init();
 
@@ -71,75 +146,9 @@ void main(void)
                                             // address ADCS (5)
 
     // initialize the command handler: from now on, commands can be processed
-    cmdHandler.init();
+    pq9bus.setReceiveHandler(&onReceive);
 
-    // Configuring Timer32 to FCLOCK (1s) of MCLK in periodic mode
-    MAP_Timer32_initModule(TIMER32_0_BASE, TIMER32_PRESCALER_1, TIMER32_32BIT,
-            TIMER32_PERIODIC_MODE);
-    MAP_Timer32_registerInterrupt(TIMER32_0_INTERRUPT, &timerHandler);
-    MAP_Timer32_setCount(TIMER32_0_BASE, FCLOCK);
-    MAP_Timer32_startTimer(TIMER32_0_BASE, false);
+    serial.println("ADCS booting...");
 
-
-    serial.println("Hello World");
-
-    while(true)
-    {
-        if (cmdHandler.commandLoop())
-        {
-            // if a correct command has been received, clear the watchdog
-            reset.kickInternalWatchDog();
-        }
-
-        // hack to simulate timer to acquire telemetry approximately once per second
-        if (counter != 0)
-        {
-            uptime ++;
-            counter = 0;
-
-            ADCSTelemetryContainer *tc = static_cast<ADCSTelemetryContainer*>(hk.getContainerToWrite());
-
-            unsigned short v;
-            signed short i, t;
-
-            // set uptime in telemetry
-            tc->setUpTime(uptime);
-
-            // measure the power bus
-            tc->setBusStatus(!powerBus.getVoltage(v));
-            tc->setBusVoltage(v);
-            tc->setBusStatus(!powerBus.getCurrent(i));
-            tc->setBusCurrent(i);
-
-            // measure the torquer X
-            tc->setTorquerXStatus(!torquerX.getVoltage(v));
-            tc->setTorquerXVoltage(v);
-            tc->setTorquerXStatus(!torquerX.getCurrent(i));
-            tc->setTorquerXCurrent(i);
-
-            // measure the torquer Y
-            tc->setTorquerYStatus(!torquerY.getVoltage(v));
-            tc->setTorquerYVoltage(v);
-            tc->setTorquerYStatus(!torquerY.getCurrent(i));
-            tc->setTorquerYCurrent(i);
-
-            // measure the torquer Z
-            tc->setTorquerZStatus(!torquerZ.getVoltage(v));
-            tc->setTorquerZVoltage(v);
-            tc->setTorquerZStatus(!torquerZ.getCurrent(i));
-            tc->setTorquerZCurrent(i);
-
-            // acquire board temperature
-            tc->setTmpStatus(!temp.getTemperature(t));
-            tc->setTemperature(t);
-
-            // telemetry collected, store the values and prepare for next collection
-            hk.stageTelemetry();
-
-            reset.kickExternalWatchDog();
-        }
-
-        //counter++;
-        //MAP_PCM_gotoLPM0();
-    }
+    DelfiPQcore::startTaskManager(tasks, 2);
 }

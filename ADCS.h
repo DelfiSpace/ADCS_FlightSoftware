@@ -19,6 +19,9 @@
 #include "PQ9CommandHandler.h"
 #include "PingService.h"
 #include "ResetService.h"
+#include "Task.h"
+#include "PeriodicTask.h"
+#include "TaskManager.h"
 #include "HousekeepingService.h"
 #include "ADCSHousekeepingService.h"
 #include "ADCSTelemetryContainer.h"
@@ -27,5 +30,10 @@
 #define FCLOCK 48000000
 
 #define ADCS_ADDRESS     5
+
+// callback functions
+void commandTask();
+void acquireTelemetry(ADCSTelemetryContainer *tc);
+void periodicTask();
 
 #endif /* ADCS_H_ */
