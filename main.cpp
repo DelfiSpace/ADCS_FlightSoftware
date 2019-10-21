@@ -25,34 +25,13 @@ ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
 ADCSHousekeepingService hk;
 Service* services[] = { &ping, &reset, &hk };
 
-// command handler, dealing with all CDHS requests and responses
-PQ9CommandHandler cmdHandler(pq9bus, services, 3);
-
 // ADCS board tasks
-Task cmdTask(commandTask);
+PQ9CommandHandler cmdHandler(pq9bus, services, 3);
 PeriodicTask timerTask(FCLOCK, periodicTask);
-Task* tasks[] = { &cmdTask, &timerTask };
+Task* tasks[] = { &cmdHandler, &timerTask };
 
 // system uptime
 unsigned long uptime = 0;
-
-void onReceive( PQ9Frame &newFrame )
-{
-    cmdHandler.received(newFrame);
-    cmdTask.notify();
-}
-
-// handler used for the execution of received commands
-void commandTask()
-{
-    if (cmdHandler.handleCommands())
-    {
-        // if a correct command has been received, clear the watch-dog
-        // if no command is received before the watch-dog triggers,
-        // the board is power-cycled
-        reset.kickInternalWatchDog();
-    }
-}
 
 void periodicTask()
 {
@@ -145,8 +124,12 @@ void main(void)
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
                                             // address ADCS (5)
 
-    // initialize the command handler: from now on, commands can be processed
-    pq9bus.setReceiveHandler(&onReceive);
+    // link the command handler to the PQ9 bus:
+    // every time a new command is received, it will be forwarded to the command handler
+    pq9bus.setReceiveHandler([](PQ9Frame &newFrame){ cmdHandler.received(newFrame); });
+
+    // every time a command is correctly processed, call the watch-dog
+    cmdHandler.onValidCommand([]{ reset.kickInternalWatchDog(); });
 
     serial.println("ADCS booting...");
 

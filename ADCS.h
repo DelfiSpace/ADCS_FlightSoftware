@@ -16,7 +16,7 @@
 #include "DWire.h"
 #include "INA226.h"
 #include "DSerial.h"
-#include "PQ9CommandHandler.h"
+#include "CommandHandler.h"
 #include "PingService.h"
 #include "ResetService.h"
 #include "Task.h"
@@ -32,7 +32,6 @@
 #define ADCS_ADDRESS     5
 
 // callback functions
-void commandTask();
 void acquireTelemetry(ADCSTelemetryContainer *tc);
 void periodicTask();
 
