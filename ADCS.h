@@ -23,7 +23,6 @@
 #include "PeriodicTask.h"
 #include "TaskManager.h"
 #include "HousekeepingService.h"
-#include "ADCSHousekeepingService.h"
 #include "ADCSTelemetryContainer.h"
 #include "TMP100.h"
 

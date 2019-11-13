@@ -22,7 +22,7 @@ DSerial serial;
 // services running in the system
 PingService ping;
 ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
-ADCSHousekeepingService hk;
+HousekeepingService<ADCSTelemetryContainer> hk;
 Service* services[] = { &ping, &reset, &hk };
 
 // ADCS board tasks
@@ -50,13 +50,7 @@ void periodicTask()
     uptime++;
 
     // collect telemetry
-    ADCSTelemetryContainer *tc = static_cast<ADCSTelemetryContainer*>(hk.getContainerToWrite());
-
-    // acquire telemetry
-    acquireTelemetry(tc);
-
-    // telemetry collected, store the values and prepare for next collection
-    hk.stageTelemetry();
+    hk.acquireTelemetry(acquireTelemetry);
 
     // refresh the watch-dog configuration to make sure that, even in case of internal
     // registers corruption, the watch-dog is capable of recovering from an error
