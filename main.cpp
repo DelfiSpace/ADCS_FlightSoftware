@@ -123,7 +123,7 @@ void main(void)
     torquerY.setShuntResistor(0.04);
     torquerZ.setShuntResistor(0.04);
 
-    temp.init(RESOLUTION_12_BIT);
+    temp.init();
 
     serial.begin( );                        // baud rate: 9600 bps
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
