@@ -142,5 +142,5 @@ void main(void)
 
     serial.println("ADCS booting...");
 
-    DelfiPQcore::startTaskManager(tasks, 2);
+    TaskManager::start(tasks, 2);
 }
