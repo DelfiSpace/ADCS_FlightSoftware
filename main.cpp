@@ -69,27 +69,23 @@ void acquireTelemetry(ADCSTelemetryContainer *tc)
     tc->setUpTime(uptime);
 
     // measure the power bus
-    tc->setBusStatus(!powerBus.getVoltage(v));
+    tc->setBusStatus((!powerBus.getVoltage(v)) & (!powerBus.getCurrent(i)));
     tc->setBusVoltage(v);
-    tc->setBusStatus(!powerBus.getCurrent(i));
     tc->setBusCurrent(i);
 
     // measure the torquer X
-    tc->setTorquerXStatus(!torquerX.getVoltage(v));
+    tc->setTorquerXStatus((!torquerX.getVoltage(v)) & (!torquerX.getCurrent(i)));
     tc->setTorquerXVoltage(v);
-    tc->setTorquerXStatus(!torquerX.getCurrent(i));
     tc->setTorquerXCurrent(i);
 
     // measure the torquer Y
-    tc->setTorquerYStatus(!torquerY.getVoltage(v));
+    tc->setTorquerYStatus((!torquerY.getVoltage(v)) & (!torquerY.getCurrent(i)));
     tc->setTorquerYVoltage(v);
-    tc->setTorquerYStatus(!torquerY.getCurrent(i));
     tc->setTorquerYCurrent(i);
 
     // measure the torquer Z
-    tc->setTorquerZStatus(!torquerZ.getVoltage(v));
+    tc->setTorquerZStatus((!torquerZ.getVoltage(v)) & (!torquerZ.getCurrent(i)));
     tc->setTorquerZVoltage(v);
-    tc->setTorquerZStatus(!torquerZ.getCurrent(i));
     tc->setTorquerZCurrent(i);
 
     // acquire board temperature
