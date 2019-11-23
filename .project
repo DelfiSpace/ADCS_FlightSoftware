@@ -4,8 +4,10 @@
 	<comment></comment>
 	<projects>
 		<project>DelfiPQcore</project>
+		<project>DSPI</project>
 		<project>DWire</project>
 		<project>INA226</project>
+		<project>MB85RS</project>
 		<project>PQ9Bus</project>
 		<project>TMP100</project>
 	</projects>

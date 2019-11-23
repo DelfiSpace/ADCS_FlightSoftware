@@ -1,8 +1,11 @@
 
 #include "ADCS.h"
 
-// I2C busses
+// I2C bus
 DWire I2Cinternal(0);
+
+// SPI bus
+DSPI spi(3);
 
 // voltage / current sensors
 INA226 powerBus(I2Cinternal, 0x40);
@@ -15,6 +18,9 @@ TMP100 temp(I2Cinternal, 0x48);
 
 // CDHS bus handler
 PQ9Bus pq9bus(3, GPIO_PORT_P9, GPIO_PIN0);
+
+// FRAM
+MB85RS fram(spi, GPIO_PORT_P1, GPIO_PIN0 );
 
 // debug console handler
 DSerial serial;
