@@ -26,13 +26,14 @@ MB85RS fram(spi, GPIO_PORT_P1, GPIO_PIN0 );
 DSerial serial;
 
 // services running in the system
+TestService test;
 PingService ping;
 ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
 HousekeepingService<ADCSTelemetryContainer> hk;
-Service* services[] = { &ping, &reset, &hk };
+Service* services[] = { &ping, &reset, &hk, &test };
 
 // ADCS board tasks
-PQ9CommandHandler cmdHandler(pq9bus, services, 3);
+PQ9CommandHandler cmdHandler(pq9bus, services, 4);
 PeriodicTask timerTask(FCLOCK, periodicTask);
 Task* tasks[] = { &cmdHandler, &timerTask };
 
@@ -119,14 +120,21 @@ void main(void)
     I2Cinternal.setFastMode();
     I2Cinternal.begin();
 
+    // Initialize SPI master
+    spi.begin();
+
     // initialize the shunt resistor
     powerBus.setShuntResistor(0.04);
     torquerX.setShuntResistor(0.04);
     torquerY.setShuntResistor(0.04);
     torquerZ.setShuntResistor(0.04);
 
+    // initialize temperature sensor
     temp.init();
 
+
+
+    // initialize the console
     serial.begin( );                        // baud rate: 9600 bps
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
                                             // address ADCS (5)

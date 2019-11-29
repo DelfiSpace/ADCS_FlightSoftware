@@ -27,6 +27,7 @@
 #include "TMP100.h"
 #include "DSPI.h"
 #include "MB85RS.h"
+#include "TestService.h"
 
 #define FCLOCK 48000000
 
