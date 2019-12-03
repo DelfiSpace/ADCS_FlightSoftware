@@ -124,10 +124,10 @@ void main(void)
     spi.begin();
 
     // initialize the shunt resistor
-    powerBus.setShuntResistor(0.04);
-    torquerX.setShuntResistor(0.04);
-    torquerY.setShuntResistor(0.04);
-    torquerZ.setShuntResistor(0.04);
+    powerBus.setShuntResistor(40);
+    torquerX.setShuntResistor(40);
+    torquerY.setShuntResistor(40);
+    torquerZ.setShuntResistor(40);
 
     // initialize temperature sensor
     temp.init();
