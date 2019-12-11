@@ -1,4 +1,3 @@
-
 #include "ADCS.h"
 
 // I2C bus
@@ -121,7 +120,9 @@ void main(void)
     I2Cinternal.begin();
 
     // Initialize SPI master
-    spi.begin();
+    spi.initMaster(DSPI::MODE0, DSPI::MSBFirst, 1000000);
+
+    fram.init();
 
     // initialize the shunt resistor
     powerBus.setShuntResistor(40);
@@ -131,8 +132,6 @@ void main(void)
 
     // initialize temperature sensor
     temp.init();
-
-
 
     // initialize the console
     serial.begin( );                        // baud rate: 9600 bps

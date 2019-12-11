@@ -22,7 +22,7 @@ bool TestService::process(PQ9Frame &command, PQ9Bus &interface, PQ9Frame &workin
             fram.init();
 
             //Read status
-            unsigned char stat = fram.read_Status();
+            /*unsigned char stat = fram.read_Status();
             serial.print("Value of status register: ");
             serial.print(stat, DEC);
             serial.println();
@@ -30,6 +30,13 @@ bool TestService::process(PQ9Frame &command, PQ9Bus &interface, PQ9Frame &workin
             serial.print("Ping: ");
             serial.print(fram.ping(), DEC);
             serial.println();
+*/
+            unsigned long id = fram.getID();
+                        serial.print("ID: ");
+                        serial.print(id, HEX);
+                        serial.println();
+
+
         } else if (command.getPayload()[1] == 1)
         {
             serial.println("Write");
