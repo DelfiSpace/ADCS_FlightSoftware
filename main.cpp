@@ -1,16 +1,11 @@
-
 #include "ADCS.h"
 
 // I2C busses
 DWire I2Cinternal(0);
-
-// voltage / current sensors
 INA226 powerBus(I2Cinternal, 0x40);
 INA226 torquerX(I2Cinternal, 0x41);
 INA226 torquerY(I2Cinternal, 0x42);
 INA226 torquerZ(I2Cinternal, 0x43);
-
-// temperature sensor
 TMP100 temp(I2Cinternal, 0x48);
 
 // CDHS bus handler
@@ -34,7 +29,7 @@ Task* tasks[] = { &cmdHandler, &timerTask };
 unsigned long uptime = 0;
 
 // TODO: remove when bug in CCS has been solved
-void kickWatchdog(PQ9Frame &newFrame)
+void receivedCommand(PQ9Frame &newFrame)
 {
     cmdHandler.received(newFrame);
 }
@@ -129,7 +124,7 @@ void main(void)
     // every time a new command is received, it will be forwarded to the command handler
     // TODO: put back the lambda function after bug in CCS has been fixed
     //pq9bus.setReceiveHandler([](PQ9Frame &newFrame){ cmdHandler.received(newFrame); });
-    pq9bus.setReceiveHandler(&kickWatchdog);
+    pq9bus.setReceiveHandler(&receivedCommand);
 
     // every time a command is correctly processed, call the watch-dog
     // TODO: put back the lambda function after bug in CCS has been fixed
