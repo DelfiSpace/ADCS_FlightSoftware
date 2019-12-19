@@ -1,12 +1,16 @@
 #include "ADCS.h"
 
-// I2C busses
+// I2C bus
 DWire I2Cinternal(0);
 INA226 powerBus(I2Cinternal, 0x40);
 INA226 torquerX(I2Cinternal, 0x41);
 INA226 torquerY(I2Cinternal, 0x42);
 INA226 torquerZ(I2Cinternal, 0x43);
 TMP100 temp(I2Cinternal, 0x48);
+
+// SPI bus
+DSPI spi(3);
+MB85RS fram(spi, GPIO_PORT_P1, GPIO_PIN0 );
 
 // CDHS bus handler
 PQ9Bus pq9bus(3, GPIO_PORT_P9, GPIO_PIN0);
@@ -15,13 +19,14 @@ PQ9Bus pq9bus(3, GPIO_PORT_P9, GPIO_PIN0);
 DSerial serial;
 
 // services running in the system
+TestService test;
 PingService ping;
 ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
 HousekeepingService<ADCSTelemetryContainer> hk;
-Service* services[] = { &ping, &reset, &hk };
+Service* services[] = { &ping, &reset, &hk, &test };
 
 // ADCS board tasks
-PQ9CommandHandler cmdHandler(pq9bus, services, 3);
+PQ9CommandHandler cmdHandler(pq9bus, services, 4);
 PeriodicTask timerTask(FCLOCK, periodicTask);
 Task* tasks[] = { &cmdHandler, &timerTask };
 
@@ -108,14 +113,20 @@ void main(void)
     I2Cinternal.setFastMode();
     I2Cinternal.begin();
 
+    // Initialize SPI master
+    spi.initMaster(DSPI::MODE0, DSPI::MSBFirst, 1000000);
+    fram.init();
+
     // initialize the shunt resistor
     powerBus.setShuntResistor(40);
     torquerX.setShuntResistor(40);
     torquerY.setShuntResistor(40);
     torquerZ.setShuntResistor(40);
 
+    // initialize temperature sensor
     temp.init();
 
+    // initialize the console
     serial.begin( );                        // baud rate: 9600 bps
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
                                             // address ADCS (5)
