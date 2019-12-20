@@ -18,19 +18,10 @@ bool TestService::process(PQ9Frame &command, PQ9Bus &interface, PQ9Frame &workin
 
         if (command.getPayload()[1] == 0)
         {
-            // initialize FRAM
-            fram.init();
-
-            //Read status
-            /*unsigned char stat = fram.read_Status();
-            serial.print("Value of status register: ");
-            serial.print(stat, DEC);
-            serial.println();
-
             serial.print("Ping: ");
             serial.print(fram.ping(), DEC);
             serial.println();
-*/
+
             unsigned long id = fram.getID();
                         serial.print("ID: ");
                         serial.print(id, HEX);
@@ -62,7 +53,7 @@ bool TestService::process(PQ9Frame &command, PQ9Bus &interface, PQ9Frame &workin
         } else if (command.getPayload()[1] == 3)
         {
             serial.println("Erase all");
-            fram.erase_All();
+            fram.erase();
         }
 
         return true;
