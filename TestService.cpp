@@ -10,7 +10,7 @@
 extern DSerial serial;
 extern MB85RS fram;
 
-bool TestService::process(PQ9Frame &command, DataBus &interface, PQ9Frame &workingBuffer)
+bool TestService::process(DataFrame &command, DataBus &interface, DataFrame &workingBuffer)
 {
     if (command.getPayload()[0] == 0)
     {
