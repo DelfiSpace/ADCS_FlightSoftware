@@ -26,7 +26,7 @@ HousekeepingService<ADCSTelemetryContainer> hk;
 Service* services[] = { &ping, &reset, &hk, &test };
 
 // ADCS board tasks
-PQ9CommandHandler cmdHandler(pq9bus, services, 4);
+CommandHandler<PQ9Frame> cmdHandler(pq9bus, services, 4);
 PeriodicTask timerTask(FCLOCK, periodicTask);
 Task* tasks[] = { &cmdHandler, &timerTask };
 
@@ -34,7 +34,7 @@ Task* tasks[] = { &cmdHandler, &timerTask };
 unsigned long uptime = 0;
 
 // TODO: remove when bug in CCS has been solved
-void receivedCommand(PQ9Frame &newFrame)
+void receivedCommand(DataFrame &newFrame)
 {
     cmdHandler.received(newFrame);
 }
