@@ -27,7 +27,9 @@ Service* services[] = { &ping, &reset, &hk, &test };
 
 // ADCS board tasks
 CommandHandler<PQ9Frame> cmdHandler(pq9bus, services, 4);
-PeriodicTask timerTask(FCLOCK, periodicTask);
+Task timerTask(periodicTask);
+Task* periodicTasks[] = {&timerTask};
+PeriodicTaskNotifier taskNotifier = PeriodicTaskNotifier(FCLOCK, periodicTasks, 1);
 Task* tasks[] = { &cmdHandler, &timerTask };
 
 // system uptime
@@ -103,12 +105,6 @@ void main(void)
     // - clock tree
     DelfiPQcore::initMCU();
 
-    // initialize the reset handler:
-    // - prepare the watch-dog
-    // - initialize the pins for the hardware watch-dog
-    // - prepare the pin for power cycling the system
-    reset.init();
-
     // Initialize I2C master
     I2Cinternal.setFastMode();
     I2Cinternal.begin();
@@ -130,6 +126,12 @@ void main(void)
     serial.begin( );                        // baud rate: 9600 bps
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
                                             // address ADCS (5)
+
+    // initialize the reset handler:
+    // - prepare the watch-dog
+    // - initialize the pins for the hardware watch-dog
+    // - prepare the pin for power cycling the system
+    reset.init();
 
     // link the command handler to the PQ9 bus:
     // every time a new command is received, it will be forwarded to the command handler

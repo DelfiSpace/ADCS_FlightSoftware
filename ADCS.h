@@ -28,6 +28,7 @@
 #include "DSPI.h"
 #include "MB85RS.h"
 #include "TestService.h"
+#include "PeriodicTaskNotifier.h"
 
 #define FCLOCK 48000000
 
