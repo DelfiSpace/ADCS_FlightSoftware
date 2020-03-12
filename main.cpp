@@ -12,6 +12,9 @@ TMP100 temp(I2Cinternal, 0x48);
 DSPI spi(3);
 MB85RS fram(spi, GPIO_PORT_P1, GPIO_PIN0 );
 
+// Bootloader
+Bootloader bootLoader = Bootloader(fram);
+
 // CDHS bus handler
 PQ9Bus pq9bus(3, GPIO_PORT_P9, GPIO_PIN0);
 
@@ -21,12 +24,20 @@ DSerial serial;
 // services running in the system
 TestService test;
 PingService ping;
-ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
+ResetService reset( GPIO_PORT_P4, GPIO_PIN0, &fram );
+
+#ifndef SW_VERSION
+SoftwareUpdateService SWupdate(fram);
+#else
+SoftwareUpdateService SWupdate(fram, (uint8_t*)xtr(SW_VERSION));
+#endif
+
+
 HousekeepingService<ADCSTelemetryContainer> hk;
-Service* services[] = { &ping, &reset, &hk, &test };
+Service* services[] = { &ping, &reset, &hk, &test, &SWupdate };
 
 // ADCS board tasks
-CommandHandler<PQ9Frame> cmdHandler(pq9bus, services, 4);
+CommandHandler<PQ9Frame> cmdHandler(pq9bus, services, 5);
 Task timerTask(periodicTask);
 Task* periodicTasks[] = {&timerTask};
 PeriodicTaskNotifier taskNotifier = PeriodicTaskNotifier(FCLOCK, periodicTasks, 1);
@@ -127,6 +138,9 @@ void main(void)
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
                                             // address ADCS (5)
 
+    //InitBootLoader!
+    bootLoader.JumpSlot();
+
     // initialize the reset handler:
     // - prepare the watch-dog
     // - initialize the pins for the hardware watch-dog
@@ -144,7 +158,13 @@ void main(void)
     //cmdHandler.onValidCommand([]{ reset.kickInternalWatchDog(); });
     cmdHandler.onValidCommand(&validCmd);
 
-    serial.println("ADCS booting...");
+    serial.print("ADCS booting...SLOT: ");
+    serial.println(Bootloader::getCurrentSlot(), DEC);
+
+    if(HAS_SW_VERSION == 1){
+        serial.print("SW_VERSION: ");
+        serial.println((const char*)xtr(SW_VERSION));
+    }
 
     TaskManager::start(tasks, 2);
 }

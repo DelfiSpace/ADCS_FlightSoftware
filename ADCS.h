@@ -9,6 +9,9 @@
 #define ADCS_H_
 
 #include <driverlib.h>
+#include "SLOT_SELECT.h"
+#include "SoftwareUpdateService.h"
+#include "Bootloader.h"
 #include "msp.h"
 #include "DelfiPQcore.h"
 #include "PQ9Bus.h"
