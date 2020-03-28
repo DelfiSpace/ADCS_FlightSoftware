@@ -19,6 +19,7 @@
 #include "DWire.h"
 #include "INA226.h"
 #include "DSerial.h"
+#include "Console.h"
 #include "CommandHandler.h"
 #include "PingService.h"
 #include "ResetService.h"

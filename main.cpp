@@ -134,7 +134,8 @@ void main(void)
     temp.init();
 
     // initialize the console
-    serial.begin( );                        // baud rate: 9600 bps
+    //serial.begin( );                        // baud rate: 9600 bps
+    Console::init( 115200 );
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
                                             // address ADCS (5)
 
@@ -151,14 +152,14 @@ void main(void)
     // every time a new command is received, it will be forwarded to the command handler
     // TODO: put back the lambda function after bug in CCS has been fixed
     //pq9bus.setReceiveHandler([](PQ9Frame &newFrame){ cmdHandler.received(newFrame); });
-    pq9bus.setReceiveHandler(&receivedCommand);
+    //pq9bus.setReceiveHandler(&receivedCommand);
 
     // every time a command is correctly processed, call the watch-dog
     // TODO: put back the lambda function after bug in CCS has been fixed
     //cmdHandler.onValidCommand([]{ reset.kickInternalWatchDog(); });
-    cmdHandler.onValidCommand(&validCmd);
+    //cmdHandler.onValidCommand(&validCmd);
 
-    serial.print("ADCS booting...SLOT: ");
+    Console::log("EPS booting...SLOT: ");
     serial.println(Bootloader::getCurrentSlot(), DEC);
 
     if(HAS_SW_VERSION == 1){
