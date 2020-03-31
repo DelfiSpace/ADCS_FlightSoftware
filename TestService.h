@@ -11,6 +11,7 @@
 #include "Service.h"
 #include "DSerial.h"
 #include "MB85RS.h"
+#include "Console.h"
 
 
 class TestService: public Service

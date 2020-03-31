@@ -58,21 +58,31 @@ bool TestService::process(DataMessage &command, DataMessage &workingBuffer)
             workingBuffer.setSize(3);
             workingBuffer.getPayload()[0] = 0;
             workingBuffer.getPayload()[1] = SERVICE_RESPONSE_REPLY;
-            serial.print("RXD Status: ");
-            uint8_t Status = 0;
-            Status = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN2);
+            uint8_t Status = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN2);
             workingBuffer.getPayload()[2] = Status;
-            serial.println(Status,DEC);
+            Console::log("RXD Status: %d", (int)Status);
+
         } else if (command.getPayload()[1] == 5)
         {
             workingBuffer.setSize(3);
             workingBuffer.getPayload()[0] = 0;
             workingBuffer.getPayload()[1] = SERVICE_RESPONSE_REPLY;
-            serial.print("TXD Status: ");
-            uint8_t Status = 0;
-            Status = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN3);
+            uint8_t Status = MAP_GPIO_getInputPinValue(GPIO_PORT_P1, GPIO_PIN3);
             workingBuffer.getPayload()[2] = Status;
-            serial.println(Status,DEC);
+            Console::log("TXD Status: %d", (int)Status);
+
+        } else if (command.getPayload()[1] == 6)
+        {
+            workingBuffer.setSize(3);
+            workingBuffer.getPayload()[0] = 0;
+            workingBuffer.getPayload()[1] = SERVICE_RESPONSE_REPLY;
+            if(Console::isEnabled()){
+                Console::log("Console Enabled!");
+                workingBuffer.getPayload()[2] = 1;
+            }else{
+                Console::log("Console Disabled!");
+                workingBuffer.getPayload()[2] = 0;
+            }
         }
 
         return true;
