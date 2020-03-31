@@ -159,12 +159,15 @@ void main(void)
     //cmdHandler.onValidCommand([]{ reset.kickInternalWatchDog(); });
     //cmdHandler.onValidCommand(&validCmd);
 
-    Console::log("EPS booting...SLOT: ");
-    serial.println(Bootloader::getCurrentSlot(), DEC);
+    Console::log("ADCS booting...SLOT: %d", (int) Bootloader::getCurrentSlot());
+    Console::log("Printing Char: %c", 'W');
+    Console::log("Printing String: %s", "It Works!");
+    Console::log("Printing Digit: %d", 999);
+    Console::log("Printing Hex: %x", 999);
+    Console::log("The %s is: %c = %d / 0x%x", "Magic Number", 'M', 999, 999);
 
     if(HAS_SW_VERSION == 1){
-        serial.print("SW_VERSION: ");
-        serial.println((const char*)xtr(SW_VERSION));
+        Console::log("SW_VERSION: %s", (const char*)xtr(SW_VERSION));
     }
 
     TaskManager::start(tasks, 2);
