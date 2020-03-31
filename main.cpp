@@ -151,12 +151,12 @@ void main(void)
     // link the command handler to the PQ9 bus:
     // every time a new command is received, it will be forwarded to the command handler
     // TODO: put back the lambda function after bug in CCS has been fixed
-    //pq9bus.setReceiveHandler([](PQ9Frame &newFrame){ cmdHandler.received(newFrame); });
+    pq9bus.setReceiveHandler([](DataFrame &newFrame){ cmdHandler.received(newFrame); });
     //pq9bus.setReceiveHandler(&receivedCommand);
 
     // every time a command is correctly processed, call the watch-dog
     // TODO: put back the lambda function after bug in CCS has been fixed
-    //cmdHandler.onValidCommand([]{ reset.kickInternalWatchDog(); });
+    cmdHandler.onValidCommand([]{ reset.kickInternalWatchDog(); });
     //cmdHandler.onValidCommand(&validCmd);
 
     Console::log("ADCS booting...SLOT: %d", (int) Bootloader::getCurrentSlot());
