@@ -59,7 +59,6 @@ void validCmd(void)
 
 void periodicTask()
 {
-    Console::log("Period!");
     // increase the timer, this happens every second
     uptime++;
 
