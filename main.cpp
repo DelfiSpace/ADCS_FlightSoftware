@@ -24,7 +24,7 @@ PQ9Bus pq9bus(3, GPIO_PORT_P9, GPIO_PIN0);
 // services running in the system
 TestService test;
 PingService ping;
-ResetService reset( GPIO_PORT_P4, GPIO_PIN0, &fram );
+ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
 
 #ifndef SW_VERSION
 SoftwareUpdateService SWupdate(fram);
@@ -140,7 +140,7 @@ void main(void)
     temp.init();
 
     // initialize the console
-    Console::init( 115200 );                        // baud rate: 9600 bps
+    Console::init( 115200 );                // baud rate: 115200 bps
     pq9bus.begin(115200, ADCS_ADDRESS);     // baud rate: 115200 bps
                                             // address ADCS (5)
 
