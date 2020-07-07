@@ -2,7 +2,7 @@
  * AlgorithmService.cpp
  *
  *  Created on: 17 Jun 2020
- *      Author: Casper, Bart
+ *      Author: Casper,Bart
  */
 
 #include "AlgorithmService.h"
