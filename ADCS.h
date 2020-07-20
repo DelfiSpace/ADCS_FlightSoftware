@@ -8,6 +8,7 @@
 #ifndef ADCS_H_
 #define ADCS_H_
 
+#include <AlgorithmService.h>
 #include <driverlib.h>
 #include "SLOT_SELECT.h"
 #include "SoftwareUpdateService.h"
