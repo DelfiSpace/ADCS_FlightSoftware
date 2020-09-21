@@ -10,7 +10,7 @@ TMP100 temp(I2Cinternal, 0x48);
 
 // SPI bus
 DSPI spi(3);
-MB85RS fram(spi, GPIO_PORT_P1, GPIO_PIN0 );
+MB85RS fram(spi, GPIO_PORT_P1, GPIO_PIN0, MB85RS::MB85RS1MT );
 
 // HardwareMonitor
 HWMonitor hwMonitor(&fram);
@@ -45,6 +45,8 @@ Task* tasks[] = { &cmdHandler, &timerTask };
 
 // system uptime
 unsigned long uptime = 0;
+FRAMVar<unsigned long> totalUptime;
+
 
 // TODO: remove when bug in CCS has been solved
 void receivedCommand(DataFrame &newFrame)
@@ -60,7 +62,8 @@ void validCmd(void)
 void periodicTask()
 {
     // increase the timer, this happens every second
-    uptime++;
+    uptime += 1;
+    totalUptime += 1;
 
     // collect telemetry
     hk.acquireTelemetry(acquireTelemetry);
@@ -75,17 +78,31 @@ void periodicTask()
 
 void acquireTelemetry(ADCSTelemetryContainer *tc)
 {
-    unsigned short v;
+    unsigned short v, c;
     signed short i, t;
+    unsigned char uc;
+    unsigned long ul;
+    //Set Telemetry:
 
-    // set uptime in telemetry
-    tc->setUpTime(uptime);
-    //tc->setMCUTemperature(hwMonitor.getMCUTemp());
+    //HouseKeeping Header:
+    tc->setStatus(Bootloader::getCurrentSlot());
+    fram.read(FRAM_RESET_COUNTER + Bootloader::getCurrentSlot(), &uc, 1);
+    tc->setBootCounter(uc);
+    tc->setResetCause(hwMonitor.getResetStatus());
+    tc->setUptime(uptime);
+    tc->setTotalUptime((unsigned long) totalUptime);
+    tc->setVersionNumber(2);
+    tc->setMCUTemp(hwMonitor.getMCUTemp());
 
-    // measure the power bus
-    tc->setBusStatus((!powerBus.getVoltage(v)) & (!powerBus.getCurrent(i)));
-    tc->setBusVoltage(v);
-    tc->setBusCurrent(i);
+    // acquire board Sensors
+    tc->setINAStatus(!(powerBus.getVoltage(v)) & !(powerBus.getCurrent(i)));
+    tc->setVoltage(v);
+    tc->setCurrent(i);
+    tc->setTMPStatus(!temp.getTemperature(t));
+    tc->setTemperature(t);
+
+//    Console::log("%d", v);
+
 
     // measure the torquer X
     tc->setTorquerXStatus((!torquerX.getVoltage(v)) & (!torquerX.getCurrent(i)));
@@ -102,9 +119,6 @@ void acquireTelemetry(ADCSTelemetryContainer *tc)
     tc->setTorquerZVoltage(v);
     tc->setTorquerZCurrent(i);
 
-    // acquire board temperature
-    tc->setTmpStatus(!temp.getTemperature(t));
-    tc->setTemperature(t);
 }
 
 /**
@@ -126,18 +140,21 @@ void main(void)
     I2Cinternal.setFastMode();
     I2Cinternal.begin();
 
-    // Initialize SPI master
-    spi.initMaster(DSPI::MODE0, DSPI::MSBFirst, 1000000);
-    fram.init();
-
     // initialize the shunt resistor
-    powerBus.setShuntResistor(40);
+    powerBus.setShuntResistor(33);
     torquerX.setShuntResistor(40);
     torquerY.setShuntResistor(40);
     torquerZ.setShuntResistor(40);
 
     // initialize temperature sensor
     temp.init();
+
+    // Initialize SPI master
+    spi.initMaster(DSPI::MODE0, DSPI::MSBFirst, 1000000);
+
+    // Initialize fram and fram-variables
+    fram.init();
+    totalUptime.init(fram, FRAM_TOTAL_UPTIME);
 
     // initialize the console
     Console::init( 115200 );                // baud rate: 115200 bps
@@ -177,6 +194,10 @@ void main(void)
     if(HAS_SW_VERSION == 1){
         Console::log("SW_VERSION: %s", (const char*)xtr(SW_VERSION));
     }
+
+    Console::log("ENABLE P10.5");
+    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P10, GPIO_PIN5);
+    MAP_GPIO_setAsOutputPin(GPIO_PORT_P10, GPIO_PIN5);
 
     TaskManager::start(tasks, 2);
 }

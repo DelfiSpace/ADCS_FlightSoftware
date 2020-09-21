@@ -35,6 +35,8 @@
 #include "PeriodicTaskNotifier.h"
 #include "HWMonitor.h"
 #include "ADCManager.h"
+#include "FRAMMap.h"
+#include "FRAMVar.h"
 
 #define FCLOCK 48000000
 
