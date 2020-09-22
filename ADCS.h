@@ -36,7 +36,9 @@
 #include "HWMonitor.h"
 #include "ADCManager.h"
 #include "FRAMMap.h"
+#include "FRAMService.h"
 #include "FRAMVar.h"
+#include "CoilService.h"
 
 #define FCLOCK 48000000
 

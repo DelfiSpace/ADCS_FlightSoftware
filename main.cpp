@@ -25,6 +25,8 @@ PQ9Bus pq9bus(3, GPIO_PORT_P9, GPIO_PIN0);
 TestService test;
 PingService ping;
 ResetService reset( GPIO_PORT_P4, GPIO_PIN0 );
+CoilService coilServ;
+FRAMService framService(fram);
 
 #ifndef SW_VERSION
 SoftwareUpdateService SWupdate(fram);
@@ -34,10 +36,10 @@ SoftwareUpdateService SWupdate(fram, (uint8_t*)xtr(SW_VERSION));
 
 
 HousekeepingService<ADCSTelemetryContainer> hk;
-Service* services[] = { &ping, &reset, &hk, &test, &SWupdate };
+Service* services[] = { &ping, &reset, &hk, &test, &SWupdate, &coilServ, &framService };
 
 // ADCS board tasks
-CommandHandler<PQ9Frame,PQ9Message> cmdHandler(pq9bus, services, 5);
+CommandHandler<PQ9Frame,PQ9Message> cmdHandler(pq9bus, services, 7);
 PeriodicTask timerTask(1000, periodicTask);
 PeriodicTask* periodicTasks[] = {&timerTask};
 PeriodicTaskNotifier taskNotifier = PeriodicTaskNotifier(periodicTasks, 1);
@@ -195,9 +197,9 @@ void main(void)
         Console::log("SW_VERSION: %s", (const char*)xtr(SW_VERSION));
     }
 
-    Console::log("ENABLE P10.5");
-    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P10, GPIO_PIN5);
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P10, GPIO_PIN5);
+//    Console::log("ENABLE P10.5");
+//    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P10, GPIO_PIN5);
+//    MAP_GPIO_setAsOutputPin(GPIO_PORT_P10, GPIO_PIN5);
 
     TaskManager::start(tasks, 2);
 }
