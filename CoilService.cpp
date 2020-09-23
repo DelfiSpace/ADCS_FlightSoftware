@@ -77,7 +77,7 @@ bool CoilService::process( DataMessage &command, DataMessage &workingBuffer )
             if(command.getPayloadSize() == 3)
             {
                 Console::log("CoilService targetCoil: %d, targetState: %d", command.getDataPayload()[1], command.getDataPayload()[2]);
-                setStatus(command.getDataPayload()[1],command.getDataPayload()[1]);
+                setStatus(command.getDataPayload()[1],command.getDataPayload()[2]);
                 workingBuffer.getDataPayload()[0] = COILSERVICE_NO_ERROR;
                 workingBuffer.setPayloadSize(1);
             }
