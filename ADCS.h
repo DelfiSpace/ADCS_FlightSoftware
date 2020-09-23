@@ -39,6 +39,7 @@
 #include "FRAMService.h"
 #include "FRAMVar.h"
 #include "CoilService.h"
+#include "BMX055.h"
 
 #define FCLOCK 48000000
 

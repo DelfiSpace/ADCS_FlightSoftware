@@ -2,11 +2,13 @@
 
 // I2C bus
 DWire I2Cinternal(0);
+DWire BMXI2C(1);
 INA226 powerBus(I2Cinternal, 0x40);
 INA226 torquerX(I2Cinternal, 0x41);
 INA226 torquerY(I2Cinternal, 0x42);
 INA226 torquerZ(I2Cinternal, 0x43);
 TMP100 temp(I2Cinternal, 0x48);
+BMX055 bmx055(BMXI2C, 0x18, 0x68, 0x12);
 
 // SPI bus
 DSPI spi(3);
@@ -68,6 +70,7 @@ void periodicTask()
     uptime += 1;
     totalUptime += 1;
 
+//    bmx055.test();
     // collect telemetry
     hk.acquireTelemetry(acquireTelemetry);
 
@@ -143,11 +146,16 @@ void main(void)
     I2Cinternal.setFastMode();
     I2Cinternal.begin();
 
+    BMXI2C.setFastMode();
+    BMXI2C.begin();
+
     // initialize the shunt resistor
     powerBus.setShuntResistor(33);
     torquerX.setShuntResistor(40);
     torquerY.setShuntResistor(40);
     torquerZ.setShuntResistor(40);
+
+    bmx055.init();
 
     // initialize temperature sensor
     temp.init();
@@ -197,6 +205,10 @@ void main(void)
     if(HAS_SW_VERSION == 1){
         Console::log("SW_VERSION: %s", (const char*)xtr(SW_VERSION));
     }
+
+    Console::log("BMX ACC NUMBER: 0x%x", bmx055.getAccId());
+    Console::log("BMX GYR NUMBER: 0x%x", bmx055.getGyroId());
+    Console::log("BMX MAG NUMBER: 0x%x", bmx055.getMagId());
 
 //    Console::log("ENABLE P10.5");
 //    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P10, GPIO_PIN5);
