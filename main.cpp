@@ -49,6 +49,7 @@ PeriodicTaskNotifier taskNotifier = PeriodicTaskNotifier(periodicTasks, 1);
 Task* tasks[] = { &cmdHandler, &timerTask };
 
 // system uptime
+uint8_t curSlot;
 unsigned long uptime = 0;
 FRAMVar<unsigned long> totalUptime;
 
@@ -91,8 +92,8 @@ void acquireTelemetry(ADCSTelemetryContainer *tc)
     //Set Telemetry:
 
     //HouseKeeping Header:
-    tc->setStatus(Bootloader::getCurrentSlot());
-    fram.read(FRAM_RESET_COUNTER + Bootloader::getCurrentSlot(), &uc, 1);
+    tc->setStatus(curSlot);
+    fram.read(FRAM_RESET_COUNTER + curSlot, &uc, 1);
     tc->setBootCounter(uc);
     tc->setResetCause(hwMonitor.getResetStatus());
     tc->setUptime(uptime);
@@ -200,7 +201,8 @@ void main(void)
     //cmdHandler.onValidCommand([]{ reset.kickInternalWatchDog(); });
     cmdHandler.onValidCommand(&validCmd);
 
-    Console::log("ADCS booting...SLOT: %d", (int) Bootloader::getCurrentSlot());
+    curSlot = Bootloader::getCurrentSlot();
+    Console::log("ADCS booting...SLOT: %d", (int) curSlot);
 
     if(HAS_SW_VERSION == 1){
         Console::log("SW_VERSION: %s", (const char*)xtr(SW_VERSION));
